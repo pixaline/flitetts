@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+
+Import('env')
+
+env_tts = env.Clone()
+env_tts.Prepend (CPPPATH = [ './flite' ])
+env_tts.add_source_files(env.modules_sources, "*.cpp")
+
+env_tts.Append(CCFLAGS=["-O2", "-MD"])
+
+ident = env["platform"]
+if ("arch" in env) and (env["arch"]):
+	ident += "_" + env["arch"]
+if ("android_arch" in env) and (env["android_arch"]):
+	ident += "_" + env["android_arch"]
+
+env.Append(LIBPATH=['../../modules/flitetts/flite_libs/' + ident + '/'])
+env.Append(LIBS=['flite_usenglish', 'flite_cmulex', 'flite'])
+if env["platform"] in ["windows"]:
+	env.Append(LIBS=['winmm'])
