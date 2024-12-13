@@ -22,6 +22,7 @@ class FliteTTS : public Node {
 		
 		bool load_voice(const String & p_id, const String &p_path);
 		Ref<AudioStreamSample> generate_tts(const String & c_voice, const String & c_text);
+		float get_tts_length(const String &c_voice, const String &c_text);
 		
 
 		FliteTTS();

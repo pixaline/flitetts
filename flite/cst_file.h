@@ -107,10 +107,6 @@ int cst_sprintf(char *s, const char *fmt, ...);
 #define INLINE __inline
 #endif
 
-#ifndef _TRUNCATE
-#define _TRUNCATE ((size_t)-1)
-#endif
-
 INLINE int c99_vsnprintf(char* str, size_t size, const char* format,
 va_list ap)  {
        int count = -1;

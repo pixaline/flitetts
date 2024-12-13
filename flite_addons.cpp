@@ -85,11 +85,11 @@ static cst_utterance *ssml_apply_tag(const char *tag,
     const char *wavefilename;
     const char *vname;
     cst_voice *nvoice;
-    cst_wave *wave;
     cst_item *t;
     cst_relation *r;
     float break_size;
 
+	/*
     if (cst_streq("AUDIO",tag))
     {
         if ((cst_streq("start",feat_string(attributes,"_type"))) ||
@@ -107,15 +107,16 @@ static cst_utterance *ssml_apply_tag(const char *tag,
             }
             else
                 delete_wave(wave);
-            return NULL; /* Cause eou */
+            return NULL;
         }
         else if (cst_streq("end",feat_string(attributes,"_type")))
         {
             feat_remove(word_feats,"ssml_comment");
-            return NULL; /* Cause eou */
+            return NULL;
         }
-    }
-    else if (cst_streq("BREAK",tag))
+    } else
+	*/
+    if (cst_streq("BREAK",tag))
     {
         if (u && 
             ((r = utt_relation(u,"Token")) != NULL) &&
@@ -197,6 +198,7 @@ static cst_utterance *ssml_apply_tag(const char *tag,
         }
 
     }
+	/*
     else if (cst_streq("VOICE",tag))
     {
         if (cst_streq("start",feat_string(attributes,"_type")))
@@ -204,17 +206,17 @@ static cst_utterance *ssml_apply_tag(const char *tag,
             vname = get_param_string(attributes,"_val0","");
             nvoice = flite_voice_select(vname);
             feat_set(feats,"current_voice",userdata_val(nvoice));
-            return NULL;  /* cause an utterance break */
+            return NULL;
         }
         else if (cst_streq("end",feat_string(attributes,"_type")))
         {
-            /* Hmm we should really have a stack of these */
             nvoice = 
             (cst_voice *)val_userdata(feat_val(feats,"default_voice"));
             feat_set(feats,"current_voice",userdata_val(nvoice));
             return NULL;
         }
     }
+	*/
 
     /* do stuff */
     /* flag what to do mark or end */
@@ -229,7 +231,7 @@ static cst_utterance *ssml_apply_tag(const char *tag,
     return u;
 }
 
-cst_wave* flite_ssml_text_to_wave(const char* text, cst_voice* voice)
+cst_wave* real_flite_ssml_text_to_wave(const char* text, cst_voice* voice, float * durdest)
 {
     cst_tokenstream* ts;
     if ((ts = ts_open_string(text,
@@ -338,13 +340,15 @@ cst_wave* flite_ssml_text_to_wave(const char* text, cst_voice* voice)
                     delete_utterance(utt); utt = NULL;
                     break;
                 }
-                //durs += flite_text_to_wave(utt,outtype,true);
-				// The following code does above, but wihtout file output
 				w = utt_wave(utt);
-				if(wave == NULL) {
-					wave = copy_wave(w);
+				if (durdest != NULL) {
+					*durdest += (float)w->num_samples / (float)w->sample_rate;
 				} else {
-					wave = concat_wave(wave, w);
+					if (wave == NULL) {
+						wave = copy_wave(w);
+					} else {
+						wave = concat_wave(wave, w);
+					}
 				}
                 delete_utterance(utt); utt = NULL;
             }
@@ -364,13 +368,18 @@ cst_wave* flite_ssml_text_to_wave(const char* text, cst_voice* voice)
             /* should create an utterances with the waveform in it */
             /* have to stream it if there is streaming */
             if (utt) delete_utterance(utt);
+
             utt = utt_synth_wave(copy_wave(w),current_voice);
             if (utt_user_callback)
-                utt = (utt_user_callback)(utt);
-				if(wave == NULL) {
-					wave = copy_wave(w);
+				utt = (utt_user_callback)(utt);
+				if (durdest != NULL) {
+					*durdest += (float)w->num_samples / (float)w->sample_rate;
 				} else {
-					wave = concat_wave(wave, w);
+					if (wave == NULL) {
+						wave = copy_wave(w);
+					} else {
+						wave = concat_wave(wave, w);
+					}
 				}
             delete_utterance(utt); utt = NULL;
 
@@ -407,3 +416,12 @@ cst_wave* flite_ssml_text_to_wave(const char* text, cst_voice* voice)
 }
 
 
+
+float flite_ssml_text_length(const char *text, cst_voice *voice) {
+	float dest = 0.0;
+	real_flite_ssml_text_to_wave(text, voice, &dest);
+	return dest;
+}
+cst_wave *flite_ssml_text_to_wave(const char *text, cst_voice *voice) {
+	return real_flite_ssml_text_to_wave(text, voice, NULL);
+}

@@ -5,18 +5,11 @@
 #include "flite_addons.h"
 
 extern "C" {
-	void usenglish_init(cst_voice* v);
-	cst_lexicon* cmulex_init(void);
+	void usenglish_init(cst_voice *v);
+	cst_lexicon *cmulex_init(void);
 }
 
 bool FliteTTS::load_voice(const String & p_id, const String &p_path) {
-	/*
-	Error err;
-	FileAccessRef f = FileAccess::open(p_path, FileAccess::READ, &err);
-
-	ERR_FAIL_COND_V(!f, 0);
-	*/
-	
 	cst_voice * voice = flite_voice_load(p_path.ascii().get_data());
 	if(voice != NULL) {
 		voices[p_id] = voice;
@@ -24,6 +17,20 @@ bool FliteTTS::load_voice(const String & p_id, const String &p_path) {
 	return (voice != NULL);
 }
 
+float FliteTTS::get_tts_length(const String &c_voice, const String &c_text) {
+	if (!voices.has(c_voice)) {
+		return NULL;
+	}
+
+	cst_voice *voice = voices.find(c_voice)->value();
+	if (voice == NULL) {
+		return NULL;
+	}
+
+	return flite_ssml_text_length(c_text.ascii().get_data(), voice);
+
+
+}
 
 Ref<AudioStreamSample> FliteTTS::generate_tts(const String & c_voice, const String & c_text) {
 	if(!voices.has(c_voice)) {
@@ -54,8 +61,6 @@ Ref<AudioStreamSample> FliteTTS::generate_tts(const String & c_voice, const Stri
 	sample->set_mix_rate(wave->sample_rate);
 	sample->set_format(AudioStreamSample::FORMAT_16_BITS);
 	sample->set_loop_mode(AudioStreamSample::LOOP_DISABLED);
-	//sample->set_loop_begin(0);
-	//sample->set_loop_end(0);
 	
 	return sample;
 }
@@ -63,6 +68,7 @@ Ref<AudioStreamSample> FliteTTS::generate_tts(const String & c_voice, const Stri
 void FliteTTS::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("load_voice"), &FliteTTS::load_voice);
 	ClassDB::bind_method(D_METHOD("generate_tts"), &FliteTTS::generate_tts);
+	ClassDB::bind_method(D_METHOD("get_tts_length"), &FliteTTS::get_tts_length);
 }
 
 FliteTTS::FliteTTS() {
