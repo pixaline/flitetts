@@ -110,8 +110,17 @@ int cst_sprintf(char *s, const char *fmt, ...);
 INLINE int c99_vsnprintf(char* str, size_t size, const char* format,
 va_list ap)  {
        int count = -1;
-       if (size != 0)
-           count = _vsnprintf_s(str, size, _TRUNCATE, format, ap);
+       if (size != 0) {
+#if (_WIN32_WINNT >= 0x0601)
+	       count = _vsnprintf_s(str, size, _TRUNCATE, format, ap);
+#else
+	       count = _vsnprintf(str, size, format, ap);
+	       if (count == -1 || (size_t)count >= size) {
+		       str[size - 1] = '\0';
+		       count = _vscprintf(format, ap);
+	       }
+#endif
+       }
        if (count == -1)
            count = _vscprintf(format, ap);
        return count;
