@@ -6,6 +6,7 @@ Import("env_modules")
 env_tts = env.Clone()
 
 env_tts.Prepend (CPPPATH = [ './flite' ])
+env_tts.Prepend (CPPDEFINES = [ '-DCST_NO_SOCKETS' ])
 
 env_tts.add_source_files(env.modules_sources, "./flite_src/**/**/*.c")
 

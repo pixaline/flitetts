@@ -475,11 +475,7 @@ int val_dec_refcount(const cst_val *b)
     }
 }
 
-#ifdef _WIN32
-__inline int utf8_sequence_length(char c0)
-#else
 int utf8_sequence_length(char c0)
-#endif
 {
     /* Get the expected length of UTF8 sequence given its most */
     /* significant byte */
