@@ -19,12 +19,12 @@ bool FliteTTS::load_voice(const String & p_id, const String &p_path) {
 
 float FliteTTS::get_tts_length(const String &c_voice, const String &c_text) {
 	if (!voices.has(c_voice)) {
-		return NULL;
+		return 0.0;
 	}
 
 	cst_voice *voice = voices.find(c_voice)->value();
 	if (voice == NULL) {
-		return NULL;
+		return 0.0;
 	}
 
 	return flite_ssml_text_length(c_text.ascii().get_data(), voice);
@@ -65,10 +65,55 @@ Ref<AudioStreamSample> FliteTTS::generate_tts(const String & c_voice, const Stri
 	return sample;
 }
 
+int FliteTTS::set_lexicon_entries(const String &c_voice, const PoolStringArray &c_lex_entries) {
+	if(!voices.has(c_voice)) {
+		return 0;
+	}
+	
+	cst_voice * voice = voices.find(c_voice)->value();
+	if(voice == NULL) {
+		return 0;
+	}
+
+    cst_lexicon *lex = val_lexicon(feat_val(voice->features, "lexicon"));
+	if(lex == NULL) {
+		return 0;
+	}
+
+	// Get existing (if any) lexical addenda
+    const cst_val *lex_addenda = NULL;
+    if (feat_present(voice->features, "lex_addenda")) {
+		lex_addenda = feat_val(voice->features, "lex_addenda");
+	}
+
+	// Do what cst_lex_load_addenda does
+	cst_val * final_addenda = NULL;
+	for(int i = 0; i < c_lex_entries.size(); i++) {
+		cst_val * new_entry = cst_lex_make_entry(lex, c_lex_entries[i].ascii().get_data());
+		if(new_entry != NULL) {
+			final_addenda = cons_val(new_entry, final_addenda);
+		}
+	}
+	final_addenda = val_reverse(final_addenda);
+	
+	// Concat with the existing voice lexicon
+    final_addenda = val_append(final_addenda, (cst_val *) lex_addenda);
+    if (lex->lex_addenda) {
+		delete_val(lex->lex_addenda);
+	}
+
+	// Assign the added one to the voice
+    lex->lex_addenda = final_addenda;
+
+    return 1;
+
+}
+
 void FliteTTS::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("load_voice"), &FliteTTS::load_voice);
 	ClassDB::bind_method(D_METHOD("generate_tts"), &FliteTTS::generate_tts);
 	ClassDB::bind_method(D_METHOD("get_tts_length"), &FliteTTS::get_tts_length);
+	ClassDB::bind_method(D_METHOD("set_lexicon_entries"), &FliteTTS::set_lexicon_entries);
 }
 
 FliteTTS::FliteTTS() {

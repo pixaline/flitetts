@@ -234,6 +234,10 @@ int in_lex(const cst_lexicon *l, const char *word, const char *pos,
     int r = FALSE, i;
     char *wp;
 
+    /* First, check the dynamically loaded addenda. */
+    if (l->lex_addenda && val_assoc_string(word, l->lex_addenda))
+        return TRUE;
+
     wp = cst_alloc(char,cst_strlen(word)+2);
     cst_sprintf(wp,"%c%s",(pos ? pos[0] : '0'),word);
 

@@ -45,7 +45,6 @@
 #include "cst_regex.h"
 
 static int text_splitable(const char *s,int i);
-static cst_val *state_name(const char *name,cst_item *t);
 
 /* compiled us regexes */
 #include "us_regexes.h"
@@ -254,7 +253,7 @@ static cst_val *us_tokentowords_one(cst_item *token, const char *name)
     const char *p;
     char *aaa, *bbb, *ccc, *ppp;
     int i,j,k,l;
-    cst_val *r, *s, *ss;
+    cst_val *r, *ss;
     const cst_val *rr;
     const char *nsw = "";
     const char *ssml_alias = "";
@@ -813,10 +812,6 @@ static cst_val *us_tokentowords_one(cst_item *token, const char *name)
 	cst_free(aaa);
 	cst_free(bbb);
     }
-    else if ((s = state_name(name,token)))
-    {
-	r = s;
-    }
     else if ((cst_strlen(name) > 1) && 
 	     (cst_regex_match(cst_rx_alpha,name)) &&
              /* AUP: Added 4th argument (voice feats) as NULL, needs to be revisited later. */
@@ -852,151 +847,4 @@ static int text_splitable(const char *s,int i)
     else
 	return TRUE;
 }
-
-static const char * const states[99][5] =
-{
-  { "AL", "ambiguous", "alabama" , NULL, NULL },
-  { "Al", "ambiguous", "alabama" , NULL, NULL },
-  { "Ala", "", "alabama" , NULL, NULL },
-  { "AK", "", "alaska" , NULL, NULL },
-  { "Ak", "", "alaska" , NULL, NULL },
-  { "AZ", "", "arizona" , NULL, NULL },
-  { "Az", "", "arizona" , NULL, NULL },
-  { "CA", "", "california" , NULL, NULL },
-  { "Ca", "", "california" , NULL, NULL },
-  { "Cal", "ambiguous", "california" , NULL, NULL },
-  { "Calif", "", "california" , NULL, NULL },
-  { "CO", "ambiguous", "colorado" , NULL, NULL },
-  { "Co", "ambiguous", "colorado" , NULL, NULL },
-  { "Colo", "", "colorado" , NULL, NULL },
-  { "DC", "", "d" , "c", NULL },
-  { "DE", "", "delaware" , NULL, NULL },
-  { "De", "ambiguous", "delaware" , NULL, NULL },
-  { "Del", "ambiguous", "delaware" , NULL, NULL },
-  { "FL", "", "florida" , NULL, NULL },
-  { "Fl", "ambiguous", "florida" , NULL, NULL },
-  { "Fla", "", "florida" , NULL, NULL },
-  { "GA", "", "georgia" , NULL, NULL },
-  { "Ga", "", "georgia" , NULL, NULL },
-  { "HI", "", "hawaii" , NULL, NULL },
-  { "Hi", "ambiguous", "hawaii" , NULL, NULL },
-  { "IA", "", "iowa" , NULL, NULL },
-  { "Ia", "ambiguous", "iowa" , NULL, NULL },
-  { "Ind", "ambiguous", "indiana" , NULL, NULL },
-  { "ID", "ambiguous", "idaho" , NULL, NULL },
-  { "IL", "ambiguous", "illinois" , NULL, NULL },
-  { "Il", "ambiguous", "illinois" , NULL, NULL },
-  { "ILL", "ambiguous", "illinois" , NULL, NULL },
-  { "KS", "", "kansas" , NULL, NULL },
-  { "Ks", "", "kansas" , NULL, NULL },
-  { "Kans", "", "kansas" , NULL, NULL },
-  { "KY", "ambiguous", "kentucky" , NULL, NULL },
-  { "Ky", "ambiguous", "kentucky" , NULL, NULL },
-  { "LA", "ambiguous", "louisiana" , NULL, NULL },
-  { "La", "ambiguous", "louisiana" , NULL, NULL },
-  { "Lou", "ambiguous", "louisiana" , NULL, NULL },
-  { "Lous", "ambiguous", "louisiana" , NULL, NULL },
-  { "MA", "ambiguous", "massachusetts" , NULL, NULL },
-  { "Mass", "ambiguous", "massachusetts" , NULL, NULL },
-  { "Ma", "ambiguous", "massachusetts" , NULL, NULL },
-  { "MD", "ambiguous", "maryland" , NULL, NULL },
-  { "Md", "ambiguous", "maryland" , NULL, NULL },
-  { "ME", "ambiguous", "maine" , NULL, NULL },
-  { "Me", "ambiguous", "maine" , NULL, NULL },
-  { "MI", "", "michigan" , NULL, NULL },
-  { "Mi", "ambiguous", "michigan" , NULL, NULL },
-  { "Mich", "ambiguous", "michigan" , NULL, NULL },
-  { "MN", "ambiguous", "minnestota" , NULL, NULL },
-  { "Minn", "ambiguous", "minnestota" , NULL, NULL },
-  { "MS", "ambiguous", "mississippi" , NULL, NULL },
-  { "Miss", "ambiguous", "mississippi" , NULL, NULL },
-  { "MT", "ambiguous", "montanna" , NULL, NULL },
-  { "Mt", "ambiguous", "montanna" , NULL, NULL },
-  { "MO", "ambiguous", "missouri" , NULL, NULL },
-  { "Mo", "ambiguous", "missouri" , NULL, NULL },
-  { "NC", "ambiguous", "north" , "carolina", NULL },
-  { "ND", "ambiguous", "north" , "dakota", NULL },
-  { "NE", "ambiguous", "nebraska" , NULL, NULL },
-  { "Ne", "ambiguous", "nebraska" , NULL, NULL },
-  { "Neb", "ambiguous", "nebraska" , NULL, NULL },
-  { "NH", "ambiguous", "new" , "hampshire", NULL },
-  { "NV", "", "nevada" , NULL, NULL },
-  { "Nev", "", "nevada" , NULL, NULL },
-  { "NY", "", "new" , "york", NULL },
-  { "OH", "ambiguous", "ohio" , NULL, NULL },
-  { "OK", "ambiguous", "oklahoma" , NULL, NULL },
-  { "Okla", "", "oklahoma" , NULL, NULL },
-  { "OR", "ambiguous", "oregon" , NULL, NULL },
-  { "Or", "ambiguous", "oregon" , NULL, NULL },
-  { "Ore", "ambiguous", "oregon" , NULL, NULL },
-  { "PA", "ambiguous", "pennsylvania" , NULL, NULL },
-  { "Pa", "ambiguous", "pennsylvania" , NULL, NULL },
-  { "Penn", "ambiguous", "pennsylvania" , NULL, NULL },
-  { "RI", "ambiguous", "rhode" , "island", NULL },
-  { "SC", "ambiguous", "south" , "carlolina", NULL },
-  { "SD", "ambiguous", "south" , "dakota", NULL },
-  { "TN", "ambiguous", "tennesee" , NULL, NULL },
-  { "Tn", "ambiguous", "tennesee" , NULL, NULL },
-  { "Tenn", "ambiguous", "tennesee" , NULL, NULL },
-  { "TX", "ambiguous", "texas" , NULL, NULL },
-  { "Tx", "ambiguous", "texas" , NULL, NULL },
-  { "Tex", "ambiguous", "texas" , NULL, NULL },
-  { "UT", "ambiguous", "utah" , NULL, NULL },
-  { "VA", "ambiguous", "virginia" , NULL, NULL },
-  { "WA", "ambiguous", "washington" , NULL, NULL },
-  { "Wa", "ambiguous", "washington" , NULL, NULL },
-  { "Wash", "ambiguous", "washington" , NULL, NULL },
-  { "WI", "ambiguous", "wisconsin" , NULL, NULL },
-  { "Wi", "ambiguous", "wisconsin" , NULL, NULL },
-  { "WV", "ambiguous", "west" , "virginia", NULL },
-  { "WY", "ambiguous", "wyoming" , NULL, NULL },
-  { "Wy", "ambiguous", "wyoming" , NULL, NULL },
-  { "Wyo", "", "wyoming" , NULL, NULL },
-  { "PR", "ambiguous", "puerto" , "rico", NULL },
-  { NULL, NULL, "puerto" , "rico", NULL }
-};
-
-static cst_val *state_name(const char *name,cst_item *t)
-{
-    int s,j;
-    int do_it = 0;
-    cst_val *r = 0;
-
-    for (s=0; states[s][0]; s++)
-    {
-	if (cst_streq(states[s][0],name))
-	{
-	    if (cst_streq(states[s][1],"ambiguous"))
-	    {
-		const char *pname = ffeature_string(t,"p.name");
-		const char *nname = ffeature_string(t,"n.name");
-		    /* previous name is capitalized */
-		if (((strchr("ABCDEFGHIJKLMNOPQRSTUVWXYZ",pname[0])) &&
-		     (cst_strlen(pname) > 2) &&
-		     (cst_regex_match(cst_rx_alpha,pname))) &&
-		    ((strchr("abcdefghijklmnopqrstuvwxyz",nname[0])) ||
-		     (item_next(t) == 0) ||
-		     (cst_streq(".",item_feat_string(t,"punc"))) ||
-		     (((cst_strlen(nname) == 5 || (cst_strlen(nname) == 10)) &&
-		       cst_regex_match(cst_rx_digits,nname)))))
-		    do_it = 1;
-		else
-		    do_it = 0;
-	    }
-	    else
-		do_it = 1;
-
-	    if (do_it)
-	    {
-		for (j=2; states[s][j]; j++)
-		    r = cons_val(string_val(states[s][j]),r);
-		return val_reverse(r);
-	    }
-	}
-    }
-    return r;
-
-}
-
-
 
