@@ -16,21 +16,21 @@ class FliteTTS : public Node {
 
 	public:
 
-		// EXPORT
-		
-		Map<String, cst_voice *> voices;
+	// EXPORT
 
-		bool load_voice(const String &p_id, const String &p_res_path);
-		Ref<AudioStreamSample> generate_tts(const String & c_voice, const String & c_text);
-		float get_tts_length(const String &c_voice, const String &c_text);
-		int set_lexicon_entries(const String &c_voice, const PoolStringArray &c_lex_entries);
-		
+	Map<String, cst_voice *> voices;
 
-		FliteTTS();
-		~FliteTTS();
+	bool load_voice(const String &p_id, const String &p_res_path);
+	Ref<AudioStreamSample> generate_tts(const String & c_voice, const String & c_text);
+	float get_tts_length(const String &c_voice, const String &c_text);
+	int set_lexicon_entries(const String &c_voice, const PoolStringArray &c_lex_entries);
+
+
+	FliteTTS();
+	~FliteTTS();
 
 	protected:
-		static void _bind_methods();
+	static void _bind_methods();
 
 
 };

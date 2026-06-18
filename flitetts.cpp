@@ -10,37 +10,37 @@
 #include <fcntl.h>
 
 static FILE *fmemopen(void *buf, size_t len, const char *mode) {
-    // Write buffer to a Windows temp file, return a FILE* to it.
-    // The file is deleted when closed via the DELETE_ON_CLOSE flag.
-    char tmp_path[MAX_PATH];
-    char tmp_dir[MAX_PATH];
-    GetTempPathA(MAX_PATH, tmp_dir);
-    GetTempFileNameA(tmp_dir, "flt", 0, tmp_path);
+	// Write buffer to a Windows temp file, return a FILE* to it.
+	// The file is deleted when closed via the DELETE_ON_CLOSE flag.
+	char tmp_path[MAX_PATH];
+	char tmp_dir[MAX_PATH];
+	GetTempPathA(MAX_PATH, tmp_dir);
+	GetTempFileNameA(tmp_dir, "flt", 0, tmp_path);
 
-    HANDLE h = CreateFileA(
-        tmp_path,
-        GENERIC_READ | GENERIC_WRITE,
-        0, NULL,
-        CREATE_ALWAYS,
-        FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE,
-        NULL
-    );
-    if (h == INVALID_HANDLE_VALUE)
-        return NULL;
+	HANDLE h = CreateFileA(
+			tmp_path,
+			GENERIC_READ | GENERIC_WRITE,
+			0, NULL,
+			CREATE_ALWAYS,
+			FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE,
+			NULL
+			);
+	if (h == INVALID_HANDLE_VALUE)
+		return NULL;
 
-    DWORD written;
-    WriteFile(h, buf, (DWORD)len, &written, NULL);
-    SetFilePointer(h, 0, NULL, FILE_BEGIN);
+	DWORD written;
+	WriteFile(h, buf, (DWORD)len, &written, NULL);
+	SetFilePointer(h, 0, NULL, FILE_BEGIN);
 
-    int fd = _open_osfhandle((intptr_t)h, _O_RDONLY | _O_BINARY);
-    if (fd == -1) {
-        CloseHandle(h);
-        return NULL;
-    }
+	int fd = _open_osfhandle((intptr_t)h, _O_RDONLY | _O_BINARY);
+	if (fd == -1) {
+		CloseHandle(h);
+		return NULL;
+	}
 
-    return _fdopen(fd, "rb");
-    // Closing this FILE* closes the fd, which closes the HANDLE,
-    // which deletes the file due to FILE_FLAG_DELETE_ON_CLOSE.
+	return _fdopen(fd, "rb");
+	// Closing this FILE* closes the fd, which closes the HANDLE,
+	// which deletes the file due to FILE_FLAG_DELETE_ON_CLOSE.
 }
 #endif
 

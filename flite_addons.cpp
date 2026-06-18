@@ -6,12 +6,12 @@ static const char * const ssml_singlecharsymbols_inattr = "=>;/\"";
 
 
 extern "C" {
-    #include "cst_cg.h"
-    #include "cst_cg_map.h"
+#include "cst_cg.h"
+#include "cst_cg_map.h"
 
-    cst_lexicon *cg_init_lang_lex(cst_voice *vox,
-                                  const cst_lang *lang_table,
-                                  const char *language);
+	cst_lexicon *cg_init_lang_lex(cst_voice *vox,
+			const cst_lang *lang_table,
+			const char *language);
 }
 
 static const char *ts_get_quoted_remainder(cst_tokenstream *ts)
