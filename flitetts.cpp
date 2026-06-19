@@ -44,6 +44,30 @@ static FILE *fmemopen(void *buf, size_t len, const char *mode) {
 }
 #endif
 
+#if (defined(__APPLE__) && MAC_OS_X_VERSION_MIN_REQUIRED < 101300) || defined(__ANDROID__)
+#include <unistd.h>
+
+static FILE *fmemopen(void *buf, size_t len, const char *mode) {
+    char tmp_path[] = "/tmp/flite_voice_XXXXXX";
+    int fd = mkstemp(tmp_path);
+    if (fd == -1)
+        return NULL;
+
+    // Unlink immediately — file stays accessible via fd until closed
+    unlink(tmp_path);
+
+    if (write(fd, buf, len) != (ssize_t)len) {
+        close(fd);
+        return NULL;
+    }
+    lseek(fd, 0, SEEK_SET);
+
+    return fdopen(fd, "rb");
+    // Closing this FILE* closes fd, which releases the last reference
+    // and deletes the file since it was already unlinked
+}
+#endif
+
 extern "C" {
 	void usenglish_init(cst_voice *v);
 	cst_lexicon *cmulex_init(void);
